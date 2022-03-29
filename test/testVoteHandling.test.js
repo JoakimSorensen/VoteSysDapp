@@ -14,11 +14,12 @@ contract("VoteHandling", (accounts) => {
 	it("Adding a candidate", async () => {
 		candidate = accounts[0];
 		let tx = await voteHandling.addCandidate(candidate);
-		// doesn't return recepit but emits candidateFailed
+		// doesn't return recepit but emits candidateAdded
 	});
 
 	it("Adding the same candidate", async () => {
 		let tx = await voteHandling.addCandidate(candidate);
+		// doesn't return recepit but emits candidateFailed
 	});
 
 	it("Vote for candidate", async () => {
@@ -32,6 +33,33 @@ contract("VoteHandling", (accounts) => {
 	it("Vote again", async () => {
 		let tx = await voteHandling.vote(candidate, { from: voter });
 		// doesn't return recepit but emits voteFailed
+	});
 
+	it("Adding an additional candidate", async () => {
+		candidate = accounts[2];
+		let tx = await voteHandling.addCandidate(candidate);
+		// doesn't return recepit but emits candidateAdded
+	});
+	
+	it("Vote again, different candidate", async () => {
+		let tx = await voteHandling.vote(candidate, { from: voter });
+		// doesn't return recepit but emits voteFailed
+	});
+	
+	it("Candidate vote for self", async () => {
+		let tx = await voteHandling.vote(candidate, { from: candidate });
+
+		truffleAssert.eventEmitted(tx, 'voteCast', (ev) => {
+			return ev.candidate === candidate && ev.voter === candidate;
+		});
+	});
+
+	it("Vote for candidate, different voter", async () => {
+		voter = accounts[3];
+		let tx = await voteHandling.vote(candidate, { from: voter });
+
+		truffleAssert.eventEmitted(tx, 'voteCast', (ev) => {
+			return ev.candidate === candidate && ev.voter === voter;
+		});
 	});
 });
