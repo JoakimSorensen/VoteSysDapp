@@ -7,7 +7,6 @@ contract VoteHandling {
 	mapping (address => bool) private isCandidate;
 	address[] private candidates;
 	mapping (address => bool) private voted;
-	address private constant EMPTY_ADDRESS = 0x0000000000000000000000000000000000000000;
 	string public description;
 
 	constructor() {
@@ -39,6 +38,10 @@ contract VoteHandling {
 		} else {
 			emit candidateFail(candidate, "Already a candidate");
 		}
+	}
+	
+	function getCandidates() public view returns (address[] memory) {
+		return candidates;
 	}
 
 	event voteCast(address voter, address candidate); 

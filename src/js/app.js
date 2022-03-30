@@ -24,18 +24,40 @@ App = {
   },
 
   initWeb3: async function() {
-    /*
-     * Replace me...
-     */
-
+	// Modern dapp browsers
+	if (window.ethereum) {
+		App.web3Provider = window.ethereum;
+		try {
+			// request account access
+			await window.ethereum.request({ method: "eth_requestAccounts"});
+		} catch (error) {
+			console.error("User denied access");
+		}
+	} else if (window.web3) {
+	// Legacy dapp browsers
+	App.web3Provider = window.web3.currentProvider;
+	} else {
+	// if no injected web3 instance is detected, fall back to develop network
+		App.web3Provider = new Web3.providers.HttpProvider("http://localhost:8545");
+	}
+	web3 = new Web3(App.web3Provider);
     return App.initContract();
   },
 
   initContract: function() {
-    /*
-     * Replace me...
-     */
+	$.getJSON('VoteHandling.json', function (data) {
+		// Get the necessary contract artifact file and instantiate it 
+		// with @truffle/contract
+		var VoteHandlingArtifact = data;
+		App.contracts.VoteHandling = TruffleContract(VoteHandlingArtifact);
 
+		// set provider for contract
+		App.contracts.VoteHandling.setProvider(App.web3Provider);
+
+		// use contract to retrieve candidates
+		return App.markAdopted();
+	
+	});
     return App.bindEvents();
   },
 
@@ -44,11 +66,22 @@ App = {
   },
 
   markAdopted: function() {
-    /*
-     * Replace me...
-     */
+	  var voteHandlingInstance;
+
+	  App.contracts.VoteHandling.deployed().then(function(instance) {
+		voteHandlingInstance = instance;
+		return voteHandlingInstance.getCandidates.call();
+	  }).then(function(candidates) {
+		for (i = 0; i < candidates.length; i++) {
+			// update candidates here
+			continue;
+		}
+	  }).catch(function(err) {
+		console.log(err.message);
+	  });
   },
 
+  // to be handleVote, call the vote function
   handleAdopt: function(event) {
     event.preventDefault();
 

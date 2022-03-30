@@ -62,4 +62,12 @@ contract("VoteHandling", (accounts) => {
 			return ev.candidate === candidate && ev.voter === voter;
 		});
 	});
+
+	it("Get all candidates", async () => {
+		let candidates = await voteHandling.getCandidates();
+		const expectedCandidates = [accounts[0], accounts[2]];
+		// use deepEqual non-value types
+		assert.deepEqual(candidates, expectedCandidates, 
+			"Candidates should be returned in order");
+	});
 });
