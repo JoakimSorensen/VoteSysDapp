@@ -1,0 +1,9 @@
+[
+  {
+    "id": 0,
+    "name": "candidate",
+    "picture": "images/smiley.jpg",
+    "age": 3,
+    "location": "Here"
+  }
+]
