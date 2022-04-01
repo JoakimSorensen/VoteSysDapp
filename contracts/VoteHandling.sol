@@ -3,15 +3,12 @@
 pragma solidity >= 0.7.0 < 0.9.0;
 
 contract VoteHandling {
-	mapping (address => address[]) private voteMap;
-	mapping (address => bool) private isCandidate;
+	mapping (address => address[]) private voteMap; // who has vote for whom
+	mapping (address => bool) private isCandidate; 
 	address[] private candidates;
 	mapping (address => bool) private voted;
-	string public description;
 
-	constructor() {
-		description = "A vote handler for users to vote on candidates, added by the contract";
-	}
+	constructor() {}
 
 	function vote(address candidate) public {
 		// check if address is valid
@@ -43,6 +40,7 @@ contract VoteHandling {
 	function getCandidates() public view returns (address[] memory) {
 		return candidates;
 	}
+
 
 	event voteCast(address voter, address candidate); 
 	event voteFailed(address voter, string message);

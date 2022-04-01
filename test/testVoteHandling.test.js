@@ -5,21 +5,31 @@ contract("VoteHandling", (accounts) => {
 	let voteHandling;
 	let candidate;
 	let voter;
+	let admin;
 
 	before(async () => {
 		voteHandling = await VoteHandling.deployed();
 		voter = accounts[1];
+		admin = accounts[5];
 	});
 
 	it("Adding a candidate", async () => {
 		candidate = accounts[0];
-		let tx = await voteHandling.addCandidate(candidate);
-		// doesn't return recepit but emits candidateAdded
+		let tx = await voteHandling.addCandidate(candidate, 
+												{from: admin});
+		// emits candidateAdded
+		truffleAssert.eventEmitted(tx, 'candidateAdded', (ev) => {
+			return ev.candidate === candidate;
+		});
 	});
 
 	it("Adding the same candidate", async () => {
-		let tx = await voteHandling.addCandidate(candidate);
-		// doesn't return recepit but emits candidateFailed
+		let tx = await voteHandling.addCandidate(candidate, 
+												{from: admin});
+		// emits candidateFail
+		truffleAssert.eventEmitted(tx, 'candidateFail', (ev) => {
+			return ev.candidate === candidate;
+		});
 	});
 
 	it("Vote for candidate", async () => {
@@ -32,18 +42,28 @@ contract("VoteHandling", (accounts) => {
 	
 	it("Vote again", async () => {
 		let tx = await voteHandling.vote(candidate, { from: voter });
-		// doesn't return recepit but emits voteFailed
+		// emits voteFailed
+		truffleAssert.eventEmitted(tx, 'voteFailed', (ev) => {
+			return ev.voter === voter;
+		});
 	});
 
 	it("Adding an additional candidate", async () => {
 		candidate = accounts[2];
-		let tx = await voteHandling.addCandidate(candidate);
-		// doesn't return recepit but emits candidateAdded
+		let tx = await voteHandling.addCandidate(candidate, 
+												{from: admin});
+		// emits candidateAdded
+		truffleAssert.eventEmitted(tx, 'candidateAdded', (ev) => {
+			return ev.candidate === candidate;
+		});
 	});
 	
 	it("Vote again, different candidate", async () => {
 		let tx = await voteHandling.vote(candidate, { from: voter });
-		// doesn't return recepit but emits voteFailed
+		// emits voteFailed
+		truffleAssert.eventEmitted(tx, 'voteFailed', (ev) => {
+			return ev.voter === voter;
+		});
 	});
 	
 	it("Candidate vote for self", async () => {
@@ -70,4 +90,5 @@ contract("VoteHandling", (accounts) => {
 		assert.deepEqual(candidates, expectedCandidates, 
 			"Candidates should be returned in order");
 	});
+
 });

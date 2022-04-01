@@ -1,9 +1,19 @@
 [
   {
     "id": 0,
-    "name": "candidate",
-    "picture": "images/smiley.jpg",
+	"acc_index": 7,
+    "name": "Knugen the First",
+    "picture": "images/knugen.jpg",
     "age": 3,
-    "location": "Here"
+    "location": "Knugdom of Sweden"
+  },
+
+  {
+	"id": 0, 
+	"acc_index": 5,
+  	"name": "Knug Artur",
+	"picture": "images/arthur.png",
+	"age": 800,
+	"location": "Knugdom of England"
   }
 ]
