@@ -66,6 +66,25 @@ App = {
   },
 
   addCandidate: function() {
+	var candidates;
+	var VoteHandlingInstance;
+	
+    $.getJSON('../candidate.json', function(data) {
+	
+	  candidates = data;		
+      var candidateRow = $('#candidateRow');
+      var candidateTemplate = $('#candidateTemplate');
+
+      for (i = 0; i < data.length; i ++) {
+        candidateTemplate.find('.panel-title').text(data[i].name);
+        candidateTemplate.find('img').attr('src', data[i].picture);
+        candidateTemplate.find('.age').text(data[i].age);
+        candidateTemplate.find('.location').text(data[i].location);
+
+        candidateRow.append(candidateTemplate.html());
+      }
+
+	}).then(function () {
 
 	web3.eth.getAccounts(function (error, accounts) {	
 		if (error) {
@@ -77,15 +96,22 @@ App = {
 	  	App.contracts.VoteHandling.deployed().then(function (instance) {
 					
 			voteHandlingInstance = instance;
-			return voteHandlingInstance.addCandidate(
-											//accounts[data[i].acc_index], 
-											accounts[0],
-											{from: accounts[0]});
+			for (i = 0; i < candidates.length; i++) {
+				async () => {
+					await voteHandlingInstance.addCandidate(
+											accounts[candidates[i].acc_index], 
+											//accounts[0],
+											{from: accounts[0]}
+											);
+				}
+			}
 		}).then(function(result) {
 				return App.getContractCandidates();
 		}).catch(function (err) {
 				console.log(err);
 		});
+		
+	});
 	});
   },
 
@@ -100,19 +126,19 @@ App = {
 		return voteHandlingInstance.getCandidates.call();
 	  }).then(function(candidates) {
 		if (candidates.length == 0) {
-			candidateTemplate.find('.panel-title').text("knugen");
-        	candidateRow.append(candidateTemplate.html());
+			//candidateTemplate.find('.panel-title').text("knugen");
+			//candidateRow.append(candidateTemplate.html());
 		} else {
 			for (i = 0; i < candidates.length; i++) {
 				// update candidates here
-				candidateTemplate.find('.panel-title').text("Knugen");
+				//candidateTemplate.find('.panel-title').text("Knugen");
 				//candidateTemplate.find('img').attr('src', data[i].picture);
         		//candidateTemplate.find('.age').text(data[i].age);
         		//candidateTemplate.find('.location').text(data[i].location);
         		candidateTemplate.find('.btn-vote').attr('data-id', 
 														candidates[i]);
 
-        		candidateRow.append(candidateTemplate.html());
+        	//	candidateRow.append(candidateTemplate.html());
 			}
 		}
 	  }).catch(function(err) {
