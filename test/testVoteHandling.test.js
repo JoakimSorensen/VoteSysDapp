@@ -90,5 +90,15 @@ contract("VoteHandling", (accounts) => {
 		assert.deepEqual(candidates, expectedCandidates, 
 			"Candidates should be returned in order");
 	});
+	
+	it("Adding several additional candidates from list", async () => {
+		let candidates = [accounts[6], accounts[7]];
+		let tx = await voteHandling.addCandidateList(candidates, 
+												{from: admin});
+		// emits candidateAdded
+		//truffleAssert.eventEmitted(tx, 'candidateAdded', (ev) => {
+		//	return ev.candidate === candidate;
+		//});
+	});
 
 });

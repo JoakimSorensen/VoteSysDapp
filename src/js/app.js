@@ -65,11 +65,11 @@ App = {
     $(document).on('click', '.btn-vote', App.handleVote);
   },
 
-  addCandidate: function() {
+  addCandidate: function () {
 	var candidates;
-	var VoteHandlingInstance;
+	var candidateList = [];
 	
-    $.getJSON('../candidate.json', function(data) {
+   	$.getJSON('../candidate.json', function (data) {
 	
 	  candidates = data;		
       var candidateRow = $('#candidateRow');
@@ -83,39 +83,35 @@ App = {
 
         candidateRow.append(candidateTemplate.html());
       }
-
 	}).then(function () {
 
-	web3.eth.getAccounts(function (error, accounts) {	
-		if (error) {
-			console.log(error);
-		}
-			
-		var accounts = accounts;
-			
-	  	App.contracts.VoteHandling.deployed().then(function (instance) {
-					
-			voteHandlingInstance = instance;
-			for (i = 0; i < candidates.length; i++) {
-				async () => {
-					await voteHandlingInstance.addCandidate(
-											accounts[candidates[i].acc_index], 
-											//accounts[0],
-											{from: accounts[0]}
-											);
-				}
+		web3.eth.getAccounts(function (error, accounts) {
+			if (error) {
+				console.log(error);
 			}
-		}).then(function(result) {
+
+			var accounts = accounts;
+
+			for (i = 0; i < candidates.length; i++) {
+				candidateList.push(accounts[candidates[i].acc_index]);
+			}
+
+			App.contracts.VoteHandling.deployed().then(function (instance) {
+				voteHandlingInstance = instance;
+
+				return voteHandlingInstance.addCandidateList(candidateList,
+														{from: accounts[0]});	
+			}).then(function(result) {
 				return App.getContractCandidates();
-		}).catch(function (err) {
+			}).catch(function(err) {
 				console.log(err);
+			});
 		});
-		
-	});
 	});
   },
 
-  getContractCandidates: function() {
+
+  getContractCandidates: function () {
 	  var voteHandlingInstance;
       var candidateRow = $('#candidateRow');
       var candidateTemplate = $('#candidateTemplate');
@@ -126,8 +122,7 @@ App = {
 		return voteHandlingInstance.getCandidates.call();
 	  }).then(function(candidates) {
 		if (candidates.length == 0) {
-			//candidateTemplate.find('.panel-title').text("knugen");
-			//candidateRow.append(candidateTemplate.html());
+			console.log("Couldn't retrieve candidates");
 		} else {
 			for (i = 0; i < candidates.length; i++) {
 				// update candidates here
@@ -135,7 +130,7 @@ App = {
 				//candidateTemplate.find('img').attr('src', data[i].picture);
         		//candidateTemplate.find('.age').text(data[i].age);
         		//candidateTemplate.find('.location').text(data[i].location);
-        		candidateTemplate.find('.btn-vote').attr('data-id', 
+        		$('.panel-candidate').eq(i).find('.button').attr('data-id', 
 														candidates[i]);
 
         	//	candidateRow.append(candidateTemplate.html());

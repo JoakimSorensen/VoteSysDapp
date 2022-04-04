@@ -36,6 +36,12 @@ contract VoteHandling {
 			emit candidateFail(candidate, "Already a candidate");
 		}
 	}
+
+	function addCandidateList(address[] memory nCandidates) public {
+		for (uint i = 0; i < nCandidates.length; i++) {
+			addCandidate(nCandidates[i]);
+		}
+	}
 	
 	function getCandidates() public view returns (address[] memory) {
 		return candidates;
