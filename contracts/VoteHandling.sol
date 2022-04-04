@@ -47,6 +47,10 @@ contract VoteHandling {
 		return candidates;
 	}
 
+	function hasVoted(address voter) public view returns (bool) {
+		return voted[voter];
+	} 
+
 
 	event voteCast(address voter, address candidate); 
 	event voteFailed(address voter, string message);

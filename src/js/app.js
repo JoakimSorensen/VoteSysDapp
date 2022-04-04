@@ -130,8 +130,35 @@ App = {
 														candidates[i]);
 			}
 		}
+	  }).then(function () {
+		return App.checkVoted();
 	  }).catch(function(err) {
 		console.log(err.message);
+	  });
+  },
+
+  // check if current account has voted
+  checkVoted: function() {
+	  var voteHandlingInstance;
+
+	  web3.eth.getAccounts(function(error, _accounts) {
+		if (error) {
+			console.log(error);
+		}
+		var accounts = _accounts;
+	  	App.contracts.VoteHandling.deployed().then(function(instance) {
+			voteHandlingInstance = instance;
+			return voteHandlingInstance.hasVoted(accounts[0]);
+	  	}).then(function(hasVoted) {
+			if (hasVoted) {
+				// disable button
+				$('.panel-candidate').find('button')
+									 .text('Thank you for your vote')
+									 .attr('disabled', true);
+			}
+	  	}).catch(function(err) {
+			console.log(err);
+	  	});
 	  });
   },
 
@@ -153,6 +180,8 @@ App = {
 			voteHandlingInstance = instance;
 			
 			return voteHandlingInstance.vote(candidateId, {from: account});
+		}).then(function() {
+			return App.checkVoted();
 		}).catch(function(err) {
 			console.log(err.message);
 		});
