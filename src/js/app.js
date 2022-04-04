@@ -125,15 +125,9 @@ App = {
 			console.log("Couldn't retrieve candidates");
 		} else {
 			for (i = 0; i < candidates.length; i++) {
-				// update candidates here
-				//candidateTemplate.find('.panel-title').text("Knugen");
-				//candidateTemplate.find('img').attr('src', data[i].picture);
-        		//candidateTemplate.find('.age').text(data[i].age);
-        		//candidateTemplate.find('.location').text(data[i].location);
+				// bind candidate id to the vote button
         		$('.panel-candidate').eq(i).find('.button').attr('data-id', 
 														candidates[i]);
-
-        	//	candidateRow.append(candidateTemplate.html());
 			}
 		}
 	  }).catch(function(err) {
