@@ -53,6 +53,7 @@ App = {
     $(document).on('click', '.btn-vote', App.handleVote);
   },
 
+  // TODO: Move this to a button!
   addCandidate: function () {
 	var candidates;
 	var candidateList = [];
@@ -135,15 +136,16 @@ App = {
   checkVoted: function() {
 	  var voteHandlingInstance;
 
-	  web3.eth.getAccounts(function(error, _accounts) {
+	  web3.eth.getAccounts(function(error, accounts) {
 		if (error) {
 			console.log(error);
 		}
-		var accounts = _accounts;
+		var account = accounts[0];
 	  	App.contracts.VoteHandling.deployed().then(function(instance) {
 			voteHandlingInstance = instance;
-			return voteHandlingInstance.hasVoted.call(accounts[0]);
+			return voteHandlingInstance.hasVoted.call(accounts);
 	  	}).then(function(hasVoted) {
+			console.log('Account ' + account + ' has voted: ' + hasVoted);
 			if (hasVoted) {
 				// disable button
 				$('.panel-candidate').find('button')
@@ -173,10 +175,14 @@ App = {
 			console.log('votes: ' + votes);
 			console.log('candates.length = ' + candidates.length);
 			for (i = 0; i < candidates.length; i++) {
-				if (votes[i] == '') {votes[i] = '0'}
+				/*TODO: For some reason the vote array is acting strange here.
+						Normal during testing and in the contract, 
+						but needs fix.*/
+				var j = candidates.length - 1 - i;  
+				if (votes[j] == '') {votes[j] = '0';}
 
         		$('.panel-candidate').eq(i).find('button')
-										   .text('Votes: ' + votes[i]);
+										   .text('Votes: ' + votes[j]);
 			}
 		}).catch(function(err) {
 			console.log(err);

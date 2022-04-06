@@ -38,10 +38,10 @@ contract VoteHandling {
 			emit candidateFail(candidate, "Already a candidate");
 		}
 	}
-
-	function addCandidateList(address[] memory nCandidates) public {
-		for (uint i = 0; i < nCandidates.length; i++) {
-			addCandidate(nCandidates[i]);
+	
+	function addCandidateList(address[] memory _candidates) public {
+		for (uint i = 0; i < _candidates.length; i++) {
+			addCandidate(_candidates[i]);
 		}
 	}
 	
