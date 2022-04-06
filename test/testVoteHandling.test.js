@@ -90,6 +90,11 @@ contract("VoteHandling", (accounts) => {
 		assert.deepEqual(candidates, expectedCandidates, 
 			"Candidates should be returned in order");
 	});
+
+	it("Get votes", async () => {
+		let votes = await voteHandling.getVotes();
+		console.log(votes);
+	});
 	
 	it("Adding several additional candidates from list", async () => {
 		let candidates = [accounts[6], accounts[7]];

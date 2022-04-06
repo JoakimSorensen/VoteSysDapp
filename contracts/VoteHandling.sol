@@ -2,6 +2,8 @@
 
 pragma solidity >= 0.7.0 < 0.9.0;
 
+import "@openzeppelin/contracts/utils/Strings.sol";
+
 contract VoteHandling {
 	mapping (address => address[]) private voteMap; // who has vote for whom
 	mapping (address => bool) private isCandidate; 
@@ -49,7 +51,15 @@ contract VoteHandling {
 
 	function hasVoted(address voter) public view returns (bool) {
 		return voted[voter];
-	} 
+	}
+
+	function getVotes() public view returns (string[] memory) {
+		string[] memory voteCount = new string[](candidates.length);
+		for (uint i = 0; i < candidates.length; i++) {
+			voteCount[i] = Strings.toString(voteMap[candidates[i]].length);
+		}
+		return voteCount;
+	}
 
 
 	event voteCast(address voter, address candidate); 

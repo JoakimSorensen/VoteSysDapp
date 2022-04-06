@@ -3,33 +3,18 @@ App = {
   contracts: {},
 
   init: async function() {
-    // Load canidates
-    $.getJSON('../candidate.json', function(data) {
-	  /*
-      var candidateRow = $('#candidateRow');
-      var candidateTemplate = $('#candidateTemplate');
-
-      for (i = 0; i < data.length; i ++) {
-        candidateTemplate.find('.panel-title').text(data[i].name);
-        candidateTemplate.find('img').attr('src', data[i].picture);
-        candidateTemplate.find('.age').text(data[i].age);
-        candidateTemplate.find('.location').text(data[i].location);
-        candidateTemplate.find('.btn-vote').attr('data-id', data[i].id);
-
-        candidateRow.append(candidateTemplate.html());
-      }*/
-    });
-
     return await App.initWeb3();
   },
 
   initWeb3: async function() {
 	// Modern dapp browsers
+	var Web3 = require("web3");
 	if (window.ethereum) {
 		App.web3Provider = window.ethereum;
 		try {
 			// request account access
 			await window.ethereum.request({ method: "eth_requestAccounts"});
+			console.log('the very first acc: ' + acc);
 		} catch (error) {
 			console.error("User denied access");
 		}
@@ -40,6 +25,9 @@ App = {
 	// if no injected web3 instance is detected, fall back to develop network
 		App.web3Provider = new Web3.providers.HttpProvider("http://localhost:8545");
 	}
+
+	
+
 	web3 = new Web3(App.web3Provider);
     return App.initContract();
   },
@@ -80,27 +68,32 @@ App = {
         candidateTemplate.find('img').attr('src', data[i].picture);
         candidateTemplate.find('.age').text(data[i].age);
         candidateTemplate.find('.location').text(data[i].location);
+		candidateTemplate.find('.btn-vote').attr('data-id', 
+												data[i].eth_address);
 
         candidateRow.append(candidateTemplate.html());
       }
 	}).then(function () {
 
+		console.log(web3.eth.accounts);
 		web3.eth.getAccounts(function (error, accounts) {
 			if (error) {
 				console.log(error);
 			}
 
-			var accounts = accounts;
+			var account = accounts[0];// only returns current selected
 
 			for (i = 0; i < candidates.length; i++) {
-				candidateList.push(accounts[candidates[i].acc_index]);
+				console.log('Adding candidate ' + candidates[i].eth_address);
+				candidateList.push(candidates[i].eth_address);
 			}
 
 			App.contracts.VoteHandling.deployed().then(function (instance) {
 				voteHandlingInstance = instance;
+				console.log('adding candidate list ' + candidateList);
 
 				return voteHandlingInstance.addCandidateList(candidateList,
-														{from: accounts[0]});	
+														{from: account});	
 			}).then(function(result) {
 				return App.getContractCandidates();
 			}).catch(function(err) {
@@ -123,13 +116,14 @@ App = {
 	  }).then(function(candidates) {
 		if (candidates.length == 0) {
 			console.log("Couldn't retrieve candidates");
-		} else {
-			for (i = 0; i < candidates.length; i++) {
-				// bind candidate id to the vote button
-        		$('.panel-candidate').eq(i).find('.button').attr('data-id', 
-														candidates[i]);
-			}
-		}
+		} 
+		console.log("candidates retrieved from contract: " + candidates);
+	
+		// If the addresses aren't in the candidates.json then bind them here.
+		// Example below:
+       		// $('.panel-candidate').eq(i)
+			// .find('button').attr('data-id', candidates[i]);
+
 	  }).then(function () {
 		return App.checkVoted();
 	  }).catch(function(err) {
@@ -148,13 +142,14 @@ App = {
 		var accounts = _accounts;
 	  	App.contracts.VoteHandling.deployed().then(function(instance) {
 			voteHandlingInstance = instance;
-			return voteHandlingInstance.hasVoted(accounts[0]);
+			return voteHandlingInstance.hasVoted.call(accounts[0]);
 	  	}).then(function(hasVoted) {
 			if (hasVoted) {
 				// disable button
 				$('.panel-candidate').find('button')
-									 .text('Thank you for your vote')
+									 .text('Collecting votes...')
 									 .attr('disabled', true);
+				return App.showVotes();
 			}
 	  	}).catch(function(err) {
 			console.log(err);
@@ -162,11 +157,38 @@ App = {
 	  });
   },
 
+  showVotes: function() {
+	var voteHandlingInstance;
+	var candidates;
+
+   	$.getJSON('../candidate.json', function (data) {
+		candidates = data;		
+	}).then(function() {
+
+		App.contracts.VoteHandling.deployed().then(function(instance) {
+			voteHandlingInstance = instance;
+			return voteHandlingInstance.getVotes.call();
+		}).then(function(_votes) {
+			var votes = _votes;
+			console.log('votes: ' + votes);
+			console.log('candates.length = ' + candidates.length);
+			for (i = 0; i < candidates.length; i++) {
+				if (votes[i] == '') {votes[i] = '0'}
+
+        		$('.panel-candidate').eq(i).find('button')
+										   .text('Votes: ' + votes[i]);
+			}
+		}).catch(function(err) {
+			console.log(err);
+		});
+	});
+  },
+
   // call the vote function
   handleVote: function(event) {
     event.preventDefault();
 
-    var candidateId = parseInt($(event.target).data('id'));
+    var candidateId = $(event.target).data('id');
 	var voteHandlingInstance;
 
 	web3.eth.getAccounts(function(error, accounts) {
@@ -178,6 +200,7 @@ App = {
 
 		App.contracts.VoteHandling.deployed().then(function(instance) {
 			voteHandlingInstance = instance;
+			console.log('Voting for candidate: ' + candidateId);
 			
 			return voteHandlingInstance.vote(candidateId, {from: account});
 		}).then(function() {

@@ -2,6 +2,7 @@
   {
     "id": 0,
 	"acc_index": 7,
+	"eth_address": "0xc9e3f003acbbbb8b178cb0cc016c2faa8be23efb",
     "name": "Knugen the First",
     "picture": "images/knugen.jpg",
     "age": 3,
@@ -11,6 +12,7 @@
   {
 	"id": 0, 
 	"acc_index": 5,
+	"eth_address": "0xe586a8e7727efc4471b7d0c8209dafe2ba8725b4",
   	"name": "Knug Artur",
 	"picture": "images/arthur.png",
 	"age": 800,
