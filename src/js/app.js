@@ -51,9 +51,14 @@ App = {
   },
 
   addCandidate: function () {
+	
+	/* For easy testing, this functionality is
+	   not supposed to be available on dapp.
+	   Admin page or similar */
+	
 	var candidates;
 	var candidateList = [];
-	
+		
    	$.getJSON('../candidate.json', function (data) {
 	
 	  candidates = data;		
@@ -70,6 +75,7 @@ App = {
 
         candidateRow.append(candidateTemplate.html());
       }
+		
 
 	  $(document).find('.btn-add-candidate').attr('style', 'visibility:hidden')
 											.attr('disable', true);
