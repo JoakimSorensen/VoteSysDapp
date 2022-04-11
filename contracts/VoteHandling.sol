@@ -53,10 +53,11 @@ contract VoteHandling {
 		return voted[voter];
 	}
 
-	function getVotes() public view returns (string[] memory) {
-		string[] memory voteCount = new string[](candidates.length);
+	function getVotes() public view returns (uint[] memory) {
+		uint[] memory voteCount = new uint[](candidates.length);
 		for (uint i = 0; i < candidates.length; i++) {
-			voteCount[i] = Strings.toString(voteMap[candidates[i]].length);
+			//voteCount[i] = Strings.toString(voteMap[candidates[i]].length);
+			voteCount[i] = voteMap[candidates[i]].length;
 		}
 		return voteCount;
 	}
