@@ -43,7 +43,7 @@ App = {
 		App.contracts.VoteHandling.setProvider(App.web3Provider);
 
 		// use contract to add candidate(s)
-		return App.addCandidate();
+		//return App.addCandidate();
 	
 	});
     return App.bindEvents();
@@ -51,6 +51,7 @@ App = {
 
   bindEvents: function() {
     $(document).on('click', '.btn-vote', App.handleVote);
+    $(document).on('click', '.btn-add-candidate', App.addCandidate);
   },
 
   // TODO: Move this to a button!
@@ -74,6 +75,9 @@ App = {
 
         candidateRow.append(candidateTemplate.html());
       }
+
+	  $(document).find('.btn-add-candidate').attr('style', 'visibility:hidden')
+											.attr('disable', true);
 	}).then(function () {
 
 		console.log(web3.eth.accounts);
