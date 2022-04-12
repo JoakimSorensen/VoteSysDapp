@@ -14,9 +14,9 @@ App = {
 		try {
 			// request account access
 			await window.ethereum.request({ method: "eth_requestAccounts"});
-			console.log('the very first acc: ' + acc);
 		} catch (error) {
 			console.error("User denied access");
+			console.log(error);
 		}
 	} else if (window.web3) {
 	// Legacy dapp browsers
@@ -101,6 +101,7 @@ App = {
 				return voteHandlingInstance.addCandidateList(candidateList,
 														{from: account});	
 			}).then(function(result) {
+				console.log("Before returning getContrCand");
 				return App.getContractCandidates();
 			}).catch(function(err) {
 				console.log(err);
@@ -115,7 +116,7 @@ App = {
       var candidateRow = $('#candidateRow');
       var candidateTemplate = $('#candidateTemplate');
 
-
+	  console.log("in getContractCandidates");
 	  App.contracts.VoteHandling.deployed().then(function(instance) {
 		voteHandlingInstance = instance;
 		return voteHandlingInstance.getCandidates.call();
