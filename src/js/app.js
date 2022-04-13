@@ -91,7 +91,6 @@ App = {
 											.attr('disable', true);
 	});
  
-	console.log(web3.eth.accounts);
 	await web3.eth.getAccounts(async (error, accounts) => {
 		if (error) {
 			console.log(error);
@@ -111,7 +110,6 @@ App = {
 		await voteHandlingInstance.addCandidateList(candidateList,
 													{from: account});	
 		
-		console.log("Before returning getContrCand");
 		return App.getContractCandidates();
 	});
   }, 
@@ -122,7 +120,6 @@ App = {
     var candidateRow = $('#candidateRow');
     var candidateTemplate = $('#candidateTemplate');
 
-	console.log("in getContractCandidates");
 	voteHandlingInstance = await App.contracts.VoteHandling.deployed();
 		
 	var candidates = await voteHandlingInstance.getCandidates.call();
@@ -215,6 +212,7 @@ App = {
   }
 
 };
+
 
 $(function() {
   $(window).load(function() {
