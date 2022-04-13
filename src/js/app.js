@@ -58,6 +58,7 @@ App = {
   bindEvents: function () {
     $(document).on('click', '.btn-vote', App.handleVote);
     $(document).on('click', '.btn-add-candidate', App.addCandidate);
+	return App.getContractCandidates();
   },
 
 
@@ -66,30 +67,14 @@ App = {
 	/* For easy testing, this functionality is
 	   supposed to be on admin page or similar */
 	
-	var candidates;
+	//var candidates;
 	var candidateList = [];
 		
-   	await $.getJSON('../candidate.json', function (data) {
-	
-	  candidates = data;		
-      var candidateRow = $('#candidateRow');
-      var candidateTemplate = $('#candidateTemplate');
-
-      for (i = 0; i < data.length; i ++) {
-        candidateTemplate.find('.panel-title').text(data[i].name);
-        candidateTemplate.find('img').attr('src', data[i].picture);
-        candidateTemplate.find('.age').text(data[i].age);
-        candidateTemplate.find('.location').text(data[i].location);
-		candidateTemplate.find('.btn-vote').attr('data-id', 
-												data[i].eth_address);
-
-        candidateRow.append(candidateTemplate.html());
-      }
-		
-
-	  $(document).find('.btn-add-candidate').attr('style', 'visibility:hidden')
-											.attr('disable', true);
+   	var candidates = await $.getJSON('../candidate.json', function (data) {
+	  //candidates = data;
+	  return data;
 	});
+	
  
 	await web3.eth.getAccounts(async (error, accounts) => {
 		if (error) {
@@ -119,23 +104,53 @@ App = {
 	var voteHandlingInstance;
     var candidateRow = $('#candidateRow');
     var candidateTemplate = $('#candidateTemplate');
-
+   	
 	voteHandlingInstance = await App.contracts.VoteHandling.deployed();
 		
 	var candidates = await voteHandlingInstance.getCandidates.call();
+	
+	console.log("candidates retrieved from contract: " + candidates);
 
 	if (candidates.length == 0) {
 		console.log("Couldn't retrieve candidates");
-	}
 
-	console.log("candidates retrieved from contract: " + candidates);
+	  $(document).find('.btn-add-candidate').attr('style', 'visibility:visible')
+											.attr('disable', false);
+	} else {
+
+		await $.getJSON('../candidate.json', function (data) {
 	
-	// If the addresses aren't in the candidates.json then bind them here.
-	// Example below:
-    // $('.panel-candidate').eq(i)
-	// .find('button').attr('data-id', candidates[i]);
+      	var candidateRow = $('#candidateRow');
+      	var candidateTemplate = $('#candidateTemplate');
 
-	return App.checkVoted();
+      	for (i = 0; i < data.length; i ++) {
+        	candidateTemplate.find('.panel-title').text(data[i].name);
+        	candidateTemplate.find('img').attr('src', data[i].picture);
+        	candidateTemplate.find('.age').text(data[i].age);
+        	candidateTemplate.find('.location').text(data[i].location);
+			candidateTemplate.find('.btn-vote').attr('data-id', 
+													data[i].eth_address);
+
+        	candidateRow.append(candidateTemplate.html());
+      	}
+	  	
+	  	$(document).find('.btn-add-candidate')
+											.attr('style', 'visibility:hidden')
+											.attr('disable', true);
+		});
+
+		/*
+		If the addresses aren't in the candidates.json then bind them here.
+		------------------------------Example------------------------------
+    	 		 $('.panel-candidate')
+									 .eq(i)
+				 				     .find('button')
+							  		 .attr('data-id', candidates[i]);
+		-------------------------------------------------------------------
+		*/
+
+		return App.checkVoted();
+	}
   },
 
 
