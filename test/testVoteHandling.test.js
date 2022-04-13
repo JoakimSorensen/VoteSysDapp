@@ -100,10 +100,7 @@ contract("VoteHandling", (accounts) => {
 		let candidates = [accounts[6], accounts[7]];
 		let tx = await voteHandling.addCandidateList(candidates, 
 												{from: admin});
-		// emits candidateAdded
-		//truffleAssert.eventEmitted(tx, 'candidateAdded', (ev) => {
-		//	return ev.candidate === candidate;
-		//});
+		// see emitted events
 	});
 
 });
